@@ -10,8 +10,9 @@ import numpy as np
 #--- fonctions perso
 
 from convertCSV import *
-
-str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
+from integration import *
+#str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
+str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Mesures_Terrain/11_22_50.CSV"
 df = pd.read_csv(str_path_data)
 
 #print type(df)
@@ -50,63 +51,70 @@ print "GPSl -> Valeur maxi : " + str(max(GPSlc)) + " Valeur mini : " + str(min(G
 #plt.show()
 
 
-X = df['Num']
-Xc = X[1:78950]
+#X = df['Num']
+#Xc = X[1:78950]
+#
+##P0 = plt.figure(0)
+#
+## Three subplots sharing both x/y axes
+#f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
+#ax1.plot(Xc,Axc)
+#ax1.set_title('Valeurs accelerometre')
+#ax2.plot(Xc, Ayc, color='g')
+#ax3.plot(Xc, Azc, color='r')
+## Fine-tune figure; make subplots close to each other and hide x ticks for
+## all but bottom plot.
+#f.subplots_adjust(hspace=0)
+#plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
+#
+#
+#P0 = plt.figure(1)
+#
+## Three subplots sharing both x/y axes
+#f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
+#ax1.plot(Xc,Gxc)
+#ax1.set_title('Valeurs goniometre')
+#ax2.plot(Xc, Gyc, color='g')
+#ax3.plot(Xc, Gzc, color='r')
+## Fine-tune figure; make subplots close to each other and hide x ticks for
+## all but bottom plot.
+#f.subplots_adjust(hspace=0)
+#plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
+#
+#
+#
+#P1 = plt.figure(2)
+#
+#
+## Three subplots sharing both x/y axes
+#f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
+#ax1.plot(Xc,Mxc)
+#ax1.set_title('Valeurs magnetometre')
+#ax2.plot(Xc, Myc, color='g')
+#ax3.plot(Xc, Mzc, color='r')
+## Fine-tune figure; make subplots close to each other and hide x ticks for
+## all but bottom plot.
+#f.subplots_adjust(hspace=0)
+#plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
+#
+#
+#P2 = plt.figure(2)
+#
+#
+##save as pdf
+#
+#pp = PdfPages('FigAlbert.pdf')
+#
+#pp.savefig(P0)
+#pp.savefig(P1)
+#pp.savefig(P2)
+#pp.close()
+#
+#plt.show()
 
-#P0 = plt.figure(0)
-
-# Three subplots sharing both x/y axes
-f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
-ax1.plot(Xc,Axc)
-ax1.set_title('Valeurs accelerometre')
-ax2.plot(Xc, Ayc, color='g')
-ax3.plot(Xc, Azc, color='r')
-# Fine-tune figure; make subplots close to each other and hide x ticks for
-# all but bottom plot.
-f.subplots_adjust(hspace=0)
-plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
-
-P0 = plt.figure(1)
-
-# Three subplots sharing both x/y axes
-f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
-ax1.plot(Xc,Gxc)
-ax1.set_title('Valeurs goniometre')
-ax2.plot(Xc, Gyc, color='g')
-ax3.plot(Xc, Gzc, color='r')
-# Fine-tune figure; make subplots close to each other and hide x ticks for
-# all but bottom plot.
-f.subplots_adjust(hspace=0)
-plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
-
-
-P1 = plt.figure(2)
-
-
-# Three subplots sharing both x/y axes
-f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
-ax1.plot(Xc,Mxc)
-ax1.set_title('Valeurs magnetometre')
-ax2.plot(Xc, Myc, color='g')
-ax3.plot(Xc, Mzc, color='r')
-# Fine-tune figure; make subplots close to each other and hide x ticks for
-# all but bottom plot.
-f.subplots_adjust(hspace=0)
-plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
-
-P2 = plt.figure(2)
-
-
-#save as pdf
-
-pp = PdfPages('FigAlbert.pdf')
-
-pp.savefig(P0)
-pp.savefig(P1)
-pp.savefig(P2)
-pp.close()
-
-plt.show()
+val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, 1024)
+velocity_init = []
+velocity_init.extend([0,0,0])
+position_init = []
+position_init.extend([0,0,0])
+velocity, position = double_integration(Axc, Axc, Azc, val_calibrtion_zero, velocity_init, position_init)

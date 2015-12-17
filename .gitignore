@@ -1,1 +1,2 @@
-convertCSV.pyc
+*.pyc
+.DS_Store
