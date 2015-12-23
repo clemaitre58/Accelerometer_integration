@@ -1,6 +1,7 @@
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 from pandas import DataFrame, read_csv
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 #matplotlib inline
 import sys
@@ -11,8 +12,9 @@ import numpy as np
 
 from convertCSV import *
 from integration import *
-#str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
-str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Mesures_Terrain/11_22_50.CSV"
+freq_ech = 100
+str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
+#str_path_data = "/Users/lemaitrecedric/Documents/Riganami/Data/Mesures_Terrain/11_22_50.CSV"
 df = pd.read_csv(str_path_data)
 
 #print type(df)
@@ -41,15 +43,20 @@ print "GPSL -> Valeur maxi : " + str(max(GPSLc)) + " Valeur mini : " + str(min(G
 print "GPSl -> Valeur maxi : " + str(max(GPSlc)) + " Valeur mini : " + str(min(GPSlc)) + " Valeur moyenne : " + str(sum(GPSlc)/len(GPSlc)) + " Ecart type : " + str(np.std(GPSlc))
 
 
+print"\n\n\n"
+
+print "Offset A : " + str(Compute_offset(sum(Axc)/len(Axc), sum(Ayc)/len(Ayc), sum(Azc)/len(Azc)))
+print "Offset G : " + str(Compute_offset(sum(Gxc)/len(Axc), sum(Gyc)/len(Gyc), sum(Gzc)/len(Gzc)))
+print "Offset M : " + str(Compute_offset(sum(Mxc)/len(Mxc), sum(Ayc)/len(Myc), sum(Azc)/len(Mzc)))
 
 #plt.annotate(texteAnnotation, xy=(1,MaxAx), xytext(8,0), xycoords=('axes fraction', 'data'), textcoords='offset points')
 #plt.annotate(texteAnnotation, xy=(1, MaxAx), xytext=(8, 0),xycoords=('axes fraction', 'data'), textcoords='offset points')
-
+#
 #plt.plot(Axc)
-
+#
 #plt.plot(Ayc)
 #plt.show()
-
+#
 
 #X = df['Num']
 #Xc = X[1:78950]
@@ -98,7 +105,7 @@ print "GPSl -> Valeur maxi : " + str(max(GPSlc)) + " Valeur mini : " + str(min(G
 #plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
 #
 #
-#P2 = plt.figure(2)
+#P2 = plt.figure(3)
 #
 #
 ##save as pdf
@@ -109,12 +116,38 @@ print "GPSl -> Valeur maxi : " + str(max(GPSlc)) + " Valeur mini : " + str(min(G
 #pp.savefig(P1)
 #pp.savefig(P2)
 #pp.close()
-#
+
 #plt.show()
 
-val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, 1024)
+val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
 velocity_init = []
 velocity_init.extend([0,0,0])
 position_init = []
 position_init.extend([0,0,0])
-velocity, position = double_integration(Axc, Axc, Azc, val_calibrtion_zero, velocity_init, position_init)
+
+Axc = Conv_g2ms2(Axc)
+Ayc = Conv_g2ms2(Ayc)
+Azc = Conv_g2ms2(Azc)
+velocity, position = double_integration(Axc, Ayc, Azc, val_calibrtion_zero, velocity_init, position_init, freq_ech)
+
+#print np.shape(position)
+#print np.shape(Axc)
+var_distance_plan_xy = position_dist_origine_planxy(position[0,:], position[1,:])
+
+val_maxi_div = 0.2
+
+ind_div_max = trouve_ind_divergence(var_distance_plan_xy, val_maxi_div)
+
+print "temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec"
+
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+##n = 100
+##for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
+##xs = randrange(n, 23, 32)
+##ys = randrange(n, 0, 100)
+##zs = randrange(n, zl, zh)
+#print np.shape(position)
+#ax.scatter(position[:,1], position[:,2], position[:,3])
+#print position[1:]
+#ax.set_xlabel('X Label')

@@ -1,3 +1,5 @@
+import numpy as np
+
 def  ValidationData(Data) :
 	print("Verification des donnees en cours")
 	colNum = Data['Num'].values
@@ -18,19 +20,19 @@ def  ConvertData(Ax,Ay,Az,Gx,Gy,Gz,Mx,My,Mz,ATemp,Sonar,GPSL,GPSl) :
 
 	# conversion des donees
 
-	Axc = Ax * 8 / 32.768
-	Ayc = Ay * 8 / 32.768
-	Azc = (Az * 8 / 32.768) - 1000
+	Axc =np. double(Ax) * 8 / 32768
+	Ayc = np.double(Ay) * 8 / 32768
+	Azc = (np.double(Az) * 8 / 32768)
 
-	Gxc = Gx * 2000 / 32.768
-	Gyc = Gy * 2000 / 32.768
-	Gzc = Gz * 2000 / 32.768
+	Gxc = np.double(Gx) * 2000 / 32768
+	Gyc = np.double(Gy) * 2000 / 32768
+	Gzc = np.double(Gz) * 2000 / 32768
 
-	Mxc = Mx * 2 / 32.768
-	Myc = My * 2 / 32.768
-	Mzc = Mz * 2 / 32.768
+	Mxc = np.double(Mx) * 2 / 32768
+	Myc = np.double(My) * 2 / 32768
+	Mzc = np.double(Mz) * 2 / 32768
 
-	ATempc = ((ATemp * 0.125)/8)+21
+	ATempc = ((np.double(ATemp) * 0.125)/8)+21
 
 	Sonarc = Sonar
 
@@ -94,3 +96,20 @@ def CropData(Data, Debut,Fin):
 
 
 	return(Axc,Ayc,Azc,Gxc,Gyc,Gzc,Mxc,Myc,Mzc,ATempc,Sonarc,GPSLc,GPSlc)
+
+def Compute_offset(a, b, c):
+    a_2 = np.power(a, 2)
+    b_2 = np.power(b, 2)
+    c_2 = np.power(c, 2)
+
+    return np.sqrt(a_2+b_2+c_2)
+
+def Conv_g2ms2(val):
+    nb_val = len(val)
+    res = []
+    for i in range(nb_val):
+        val_lu = val[i];
+        val_lu *= 9.80665
+        res.append(val_lu)
+
+    return res
