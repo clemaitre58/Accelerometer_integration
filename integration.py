@@ -28,23 +28,31 @@ def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, posit
         if (i == 0):
             #Attention a le faire plus proprement pour initialisation different de
             # A(0, 0,0) V(0, 0, 0)
-            velocity_x.append(0)
-            velocity_y.append(0)
-            velocity_z.append(0)
+            velocity_x.append(velocity_init[0])
+            velocity_y.append(velocity_init[1])
+            velocity_z.append(velocity_init[2])
 
-            position_x.append(0)
-            position_y.append(0)
-            position_z.append(0)
+            position_x.append(position_init[0])
+            position_y.append(position_init[1])
+            position_z.append(position_init[2])
         if (i == 1):
-            velocity_x.append(vect_x[1]/2. * delta_t)
-            velocity_y.append(vect_y[1]/2. * delta_t)
-            velocity_z.append(vect_z[1]/2. * delta_t)
+       #     velocity_x.append(vect_x[1]/2. * delta_t)
+       #     velocity_y.append(vect_y[1]/2. * delta_t)
+       #     velocity_z.append(vect_z[1]/2. * delta_t)
 
-            position_x.append(velocity_x[1]/2. *delta_t)
-            position_y.append(velocity_y[1]/2. *delta_t)
-            position_z.append(velocity_z[1]/2.  *delta_t)
+       #     position_x.append(velocity_x[1]/2. *delta_t)
+       #     position_y.append(velocity_y[1]/2. *delta_t)
+       #     position_z.append(velocity_z[1]/2.  *delta_t)
+
+            velocity_x.append(velocity_init[0]+integration_trapeze_init(velocity_init[0], i, vect_x, delta_t))
+            velocity_y.append(velocity_init[1]+integration_trapeze_init(velocity_init[1], i, vect_y, delta_t))
+            velocity_z.append(velocity_init[2]+integration_trapeze_init(velocity_init[2], i, vect_z, delta_t))
+
+            position_x.append(position_init[0]+integration_trapeze_init(position_init[0], i, velocity_x, delta_t))
+            position_y.append(position_init[1]+integration_trapeze_init(position_init[1], i, velocity_y, delta_t))
+            position_z.append(position_init[2]+integration_trapeze_init(position_init[2], i, velocity_z, delta_t))
         if (i > 1):
-            #            ipdb.set_trace()
+            ipdb.set_trace()
             velocity_x.append(velocity_x[i-1]+integration_trapeze(i-1, i, vect_x, delta_t))
             velocity_y.append(velocity_y[i-1]+integration_trapeze(i-1, i, vect_y, delta_t))
             velocity_z.append(velocity_z[i-1]+integration_trapeze(i-1, i, vect_z, delta_t))
@@ -66,6 +74,15 @@ def integration_trapeze(a, b, f, delta_t):
     val_int *= delta_t
 
     return val_int
+
+def integration_trapeze_init(val_init, b, f, delta_t):
+    f_a = val_init
+    f_b = f[b]
+    val_int = (f_a+f_b)/2.
+    val_int *= delta_t
+
+    return val_int
+
 def position_dist_origine_planxy(x, y, x0=0, y0=0):
     x -= x0
     y -= y0
@@ -83,3 +100,7 @@ def trouve_ind_divergence(vect, val_divergence):
         if (vect[i] >= val_divergence):
             return i
 
+def trouve_dis_div_temps(vect, temps, freq_ech):
+    taille_vect = len(vect)
+    nb_ech_stop = temps / (1./freq_ech)
+    return vect[nb_ech_stop]
