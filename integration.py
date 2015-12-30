@@ -52,7 +52,7 @@ def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, posit
             position_y.append(position_init[1]+integration_trapeze_init(position_init[1], i, velocity_y, delta_t))
             position_z.append(position_init[2]+integration_trapeze_init(position_init[2], i, velocity_z, delta_t))
         if (i > 1):
-            ipdb.set_trace()
+            #ipdb.set_trace()
             velocity_x.append(velocity_x[i-1]+integration_trapeze(i-1, i, vect_x, delta_t))
             velocity_y.append(velocity_y[i-1]+integration_trapeze(i-1, i, vect_y, delta_t))
             velocity_z.append(velocity_z[i-1]+integration_trapeze(i-1, i, vect_z, delta_t))

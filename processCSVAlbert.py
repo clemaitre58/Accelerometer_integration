@@ -138,8 +138,10 @@ val_maxi_div = 0.2
 
 ind_div_max = trouve_ind_divergence(var_distance_plan_xy, val_maxi_div)
 
-print "temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec"
+temps_div_dist = trouve_dis_div_temps(var_distance_plan_xy, 60, freq_ech)
 
+print "temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec"
+print "Distance de diverge après 1min : " + str(temps_div_dist) + "m"
 #fig = plt.figure()
 #ax = fig.add_subplot(111, projection='3d')
 ##n = 100
