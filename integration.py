@@ -1,5 +1,6 @@
 import numpy as np
-import ipdb;
+import ipdb
+
 def calcul_offset(vect_x, vect_y, vect_z, taille_cal_offset):
     taille_tab = len(vect_x)
     acc_x = acc_y = acc_z  = 0
@@ -36,14 +37,6 @@ def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, posit
             position_y.append(position_init[1])
             position_z.append(position_init[2])
         if (i == 1):
-       #     velocity_x.append(vect_x[1]/2. * delta_t)
-       #     velocity_y.append(vect_y[1]/2. * delta_t)
-       #     velocity_z.append(vect_z[1]/2. * delta_t)
-
-       #     position_x.append(velocity_x[1]/2. *delta_t)
-       #     position_y.append(velocity_y[1]/2. *delta_t)
-       #     position_z.append(velocity_z[1]/2.  *delta_t)
-
             velocity_x.append(velocity_init[0]+integration_trapeze_init(velocity_init[0], i, vect_x, delta_t))
             velocity_y.append(velocity_init[1]+integration_trapeze_init(velocity_init[1], i, vect_y, delta_t))
             velocity_z.append(velocity_init[2]+integration_trapeze_init(velocity_init[2], i, vect_z, delta_t))
@@ -104,3 +97,75 @@ def trouve_dis_div_temps(vect, temps, freq_ech):
     taille_vect = len(vect)
     nb_ech_stop = temps / (1./freq_ech)
     return vect[nb_ech_stop]
+
+
+def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, freq_ech, nb_ech):
+    delta_t = 1./freq_ech
+    taille_vect = len(vect_x)
+    velocity_x = []
+    velocity_y = []
+    velocity_z = []
+
+    position_x = []
+    position_y = []
+    position_z = []
+    for i in range(taille_vect-nb_ech):
+        if (i == 0):
+            velocity_x.append(velocity_init[0])
+            velocity_y.append(velocity_init[1])
+            velocity_z.append(velocity_init[2])
+
+            position_x.append(position_init[0])
+            position_y.append(position_init[1])
+            position_z.append(position_init[2])
+        if (i == 1):
+            velocity_x.append(velocity_init[0]+integration_simpson_init(velocity_init[0], i, vect_x, delta_t, nb_ech))
+            velocity_y.append(velocity_init[1]+integration_simpson_init(velocity_init[1], i, vect_y, delta_t, nb_ech))
+            velocity_z.append(velocity_init[2]+integration_simpson_init(velocity_init[2], i, vect_z, delta_t, nb_ech))
+
+            position_x.append(position_init[0]+integration_simpson_init(position_init[0], i, velocity_x, delta_t, nb_ech))
+            position_y.append(position_init[1]+integration_simpson_init(position_init[1], i, velocity_y, delta_t, nb_ech))
+            position_z.append(position_init[2]+integration_simpson_init(position_init[2], i, velocity_z, delta_t, nb_ech))
+        if (i > 1):
+            #ipdb.set_trace()
+            velocity_x.append(velocity_x[i-1]+integration_simpson(i-1, i, vect_x, delta_t, nb_ech))
+            velocity_y.append(velocity_y[i-1]+integration_simpson(i-1, i, vect_y, delta_t, nb_ech))
+            velocity_z.append(velocity_z[i-1]+integration_simpson(i-1, i, vect_z, delta_t, nb_ech))
+
+            position_x.append(position_x[i-1]+integration_simpson(i-1, i, velocity_x, delta_t, nb_ech))
+            position_y.append(position_y[i-1]+integration_simpson(i-1, i, velocity_y, delta_t, nb_ech))
+            position_z.append(position_z[i-1]+integration_simpson(i-1, i, velocity_z, delta_t, nb_ech))
+    #ipdb.set_trace()
+    #    print np.shape(position_x)
+    #    print np.shape(position_y)
+    velocity = np.array([velocity_x, velocity_y, velocity_z])
+    position = np.array([position_x, position_y, position_z])
+    return velocity, position
+
+def integration_simpson(a, b, f, delta_t, nb_ech):
+    h = (b-a)/np.double(nb_ech)
+    z = np.double(f[a]+f[b])/6.
+    for i in range(1,nb_ech) :
+        z = z+f[np.int(a+i*h)]/3.
+    for i in range(nb_ech) :
+        z=z+f[np.int(a+(2.*i+1)*h/2.)]*2./3.
+
+    val_int =  z*h
+    val_int *= delta_t
+
+    return val_int
+
+def integration_simpson_init(val_init, b, f, delta_t, nb_ech):
+    a = 0
+    f_a = val_init
+    h = (b-a)/np.double(nb_ech)
+    z = np.double(f_a+f[b])/6.
+    for i in range(1,nb_ech) :
+        z = z+f[np.int(a+i*h)]/3.
+    for i in range(nb_ech) :
+        z=z+f[np.int(a+(2.*i+1)*h/2)]*2./3.
+
+    val_int =z*h
+    val_int *= delta_t
+
+    return val_int

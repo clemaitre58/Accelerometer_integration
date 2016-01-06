@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import sys
 import pandas as pd
 import numpy as np
-
+import ipdb
 #--- fonctions perso
 
 from convertCSV import *
@@ -121,18 +121,31 @@ print "Offset M : " + str(Compute_offset(sum(Mxc)/len(Mxc), sum(Ayc)/len(Myc), s
 
 val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
 velocity_init = []
-velocity_init.extend([0,0,0])
+velocity_init.extend([0, 0, 0])
 position_init = []
-position_init.extend([0,0,0])
+position_init.extend([0, 0, 0])
 
 Axc = Conv_g2ms2(Axc)
 Ayc = Conv_g2ms2(Ayc)
 Azc = Conv_g2ms2(Azc)
 velocity, position = double_integration(Axc, Ayc, Azc, val_calibrtion_zero, velocity_init, position_init, freq_ech)
 
+velocity_simpson, position_simpson = double_integration_simpson(
+    Axc,
+    Ayc,
+    Azc,
+    val_calibrtion_zero,
+    velocity_init,
+    position_init,
+    freq_ech,
+    20)
+
 #print np.shape(position)
 #print np.shape(Axc)
-var_distance_plan_xy = position_dist_origine_planxy(position[0,:], position[1,:])
+var_distance_plan_xy = position_dist_origine_planxy(position[0, :], position[1, :])
+var_distance_plan_xy_simpson = position_dist_origine_planxy(
+    position_simpson[0, :],
+    position_simpson[1, :])
 
 val_maxi_div = 0.2
 
@@ -143,6 +156,36 @@ temps_div_dist = trouve_dis_div_temps(var_distance_plan_xy, 60, freq_ech)
 print "temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec"
 print "Distance de diverge après 1min : " + str(temps_div_dist) + "m"
 #fig = plt.figure()
+ind_div_max_simpson = trouve_ind_divergence(var_distance_plan_xy_simpson, val_maxi_div)
+
+temps_div_dist_simpson = trouve_dis_div_temps(var_distance_plan_xy_simpson, 60, freq_ech)
+
+print "Methode de Simpson -> temps pour diverger de " + str(val_maxi_div)  + "m : " + str(ind_div_max_simpson* 1./freq_ech) + "sec"
+print "Methode de Simpson -> Distance de diverge après 1min : " + str(temps_div_dist_simpson) + "m"
+
+#ipdb.set_trace()
+delta_pos = np.abs(
+    (
+
+        position[0, 0:78900]
+        -
+        position_simpson[0, 0:78900]
+    )
+    )/np.abs(position[0, 0:78900])
+
+delta_pos *= 1000.
+#)
+
+if(position[0, 0]==0 and position_simpson[0, 0]==0) :
+    delta_pos[0] = 0
+
+val_un = np.ones((78900, ))
+
+plt.figure()
+plt.plot(delta_pos[100: 78900])
+#plt.plot(val_un)
+plt.show()
+
 #ax = fig.add_subplot(111, projection='3d')
 ##n = 100
 ##for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
