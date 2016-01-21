@@ -152,7 +152,7 @@ val_maxi_div = 0.2
 ind_div_max = trouve_ind_divergence(var_distance_plan_xy, val_maxi_div)
 
 temps_div_dist = trouve_dis_div_temps(var_distance_plan_xy, 60, freq_ech)
-
+temps_div_dist_1 = trouve_dis_div_temps(var_distance_plan_xy, 1, freq_ech)
 print "temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec"
 print "Distance de diverge après 1min : " + str(temps_div_dist) + "m"
 #fig = plt.figure()
@@ -162,7 +162,7 @@ temps_div_dist_simpson = trouve_dis_div_temps(var_distance_plan_xy_simpson, 60, 
 
 print "Methode de Simpson -> temps pour diverger de " + str(val_maxi_div)  + "m : " + str(ind_div_max_simpson* 1./freq_ech) + "sec"
 print "Methode de Simpson -> Distance de diverge après 1min : " + str(temps_div_dist_simpson) + "m"
-
+print "Methode de Simpson -> Distance de diverge après 1sec : " + str(temps_div_dist_1) + "m"
 #ipdb.set_trace()
 delta_pos = np.abs(
     (
