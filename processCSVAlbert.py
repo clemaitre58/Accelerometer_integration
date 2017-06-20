@@ -24,7 +24,7 @@ df = pd.read_csv(str_path_data)
 #print type(df)
 
 
-[Ax,Ay,Az] = CropData(df, 1000, 8532)
+[Ax,Ay,Az] = CropData(df, 2000, 8532)
 
 #ValidationData(df)
 

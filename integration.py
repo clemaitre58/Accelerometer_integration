@@ -116,7 +116,8 @@ def trouve_ind_divergence(vect, val_divergence):
 def trouve_dis_div_temps(vect, temps, freq_ech):
     taille_vect = len(vect)
     nb_ech_stop = temps / (1/freq_ech)
-    return vect[nb_ech_stop]
+    
+    return vect[int(nb_ech_stop)]
 
 
 def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, freq_ech, nb_ech):
