@@ -8,40 +8,40 @@ def  ValidationData(Data) :
 	tailleTab = len(colNum)
 	for element in colNum :
 		if ((cpt + 1) < tailleTab-1) and (element != (colNum[cpt + 1] -1)) :
-			print "erreur ligne : " + str(element)
+			print ("erreur ligne : " + str(element))
 			nbErreur += 1
 		cpt += 1
-	print "Total Nb erreurs : " + str(nbErreur)
+	print ("Total Nb erreurs : " + str(nbErreur))
 	print("Verification des donnees termine")
 
 
-def  ConvertData(Ax,Ay,Az,Gx,Gy,Gz,Mx,My,Mz,ATemp,Sonar,GPSL,GPSl) :
+def  ConvertData(Ax,Ay,Az) :
 	print("Convertion des donnees en cours")
 
 	# conversion des donees
 
-	Axc =np. double(Ax) * 8 / 32768
-	Ayc = np.double(Ay) * 8 / 32768
-	Azc = (np.double(Az) * 8 / 32768)
+	Axc =np. double(Ax) * 4 / 32768
+	Ayc = np.double(Ay) * 4/ 32768
+	Azc = (np.double(Az) * 4/ 32768)
 
-	Gxc = np.double(Gx) * 2000 / 32768
-	Gyc = np.double(Gy) * 2000 / 32768
-	Gzc = np.double(Gz) * 2000 / 32768
+	#Gxc = np.double(Gx) * 2000 / 32768
+	#Gyc = np.double(Gy) * 2000 / 32768
+	#Gzc = np.double(Gz) * 2000 / 32768
 
-	Mxc = np.double(Mx) * 2 / 32768
-	Myc = np.double(My) * 2 / 32768
-	Mzc = np.double(Mz) * 2 / 32768
+	#Mxc = np.double(Mx) * 2 / 32768
+	#Myc = np.double(My) * 2 / 32768
+	#Mzc = np.double(Mz) * 2 / 32768
 
-	ATempc = ((np.double(ATemp) * 0.125)/8)+21
+	#ATempc = ((np.double(ATemp) * 0.125)/8)+21
 
-	Sonarc = Sonar
+	#Sonarc = Sonar
 
-	GPSLc = GPSL
-	GPSlc = GPSl
+	#GPSLc = GPSL
+	#GPSlc = GPSl
 
 	print("Convertion des donnees termine")
 
-	return(Axc,Ayc,Azc,Gxc,Gyc,Gzc,Mxc,Myc,Mzc,ATempc,Sonarc,GPSLc,GPSlc)
+	return(Axc,Ayc,Azc)
 
 def CropData(Data, Debut,Fin):
 
@@ -50,52 +50,52 @@ def CropData(Data, Debut,Fin):
 	Ay = Data['Ay'].values
 	Az = Data['Az'].values
 
-	# goniometre
-	Gx = Data['Gx'].values
-	Gy = Data['Gy'].values
-	Gz = Data['Gz'].values
+	## goniometre
+	#Gx = Data['Gx'].values
+	#Gy = Data['Gy'].values
+	#Gz = Data['Gz'].values
 
-	#magnetometre
-	Mx = Data['Mx'].values
-	My = Data['My'].values
-	Mz = Data['Mz'].values
+	##magnetometre
+	#Mx = Data['Mx'].values
+	#My = Data['My'].values
+	#Mz = Data['Mz'].values
 
-	#capteur de temperature
-	ATemp = Data['ATemp'].values
+	##capteur de temperature
+	#ATemp = Data['ATemp'].values
 
-	#sonar
-	Sonar = Data['SONAR'].values
+	##sonar
+	#Sonar = Data['SONAR'].values
 
-	#gps
-	GPSL = Data['GPSL'].values
-	GPSl = Data['GPSl'].values
+	##gps
+	#GPSL = Data['GPSL'].values
+	#GPSl = Data['GPSl'].values
 
-	# conversion des donees
+	## conversion des donees
 
 	Axc = Ax[Debut:Fin]
 	Ayc = Ay[Debut:Fin]
 	Azc = Az[Debut:Fin]
 
 
-	Gxc = Gx[Debut:Fin]
-	Gyc = Gy[Debut:Fin]
-	Gzc = Gz[Debut:Fin]
+	#Gxc = Gx[Debut:Fin]
+	#Gyc = Gy[Debut:Fin]
+	#Gzc = Gz[Debut:Fin]
 
-	Mxc = Mx[Debut:Fin]
-	Myc = My[Debut:Fin]
-	Mzc = Mz[Debut:Fin]
+	#Mxc = Mx[Debut:Fin]
+	#Myc = My[Debut:Fin]
+	#Mzc = Mz[Debut:Fin]
 
-	ATempc = ATemp[Debut:Fin]
+	#ATempc = ATemp[Debut:Fin]
 
-	Sonarc = Sonar[Debut:Fin]
-
-
-	GPSLc = GPSL[Debut:Fin]
-
-	GPSlc = GPSl[Debut:Fin]
+	#Sonarc = Sonar[Debut:Fin]
 
 
-	return(Axc,Ayc,Azc,Gxc,Gyc,Gzc,Mxc,Myc,Mzc,ATempc,Sonarc,GPSLc,GPSlc)
+	#GPSLc = GPSL[Debut:Fin]
+
+	#GPSlc = GPSl[Debut:Fin]
+
+
+	return(Axc,Ayc,Azc)
 
 def Compute_offset(a, b, c):
     a_2 = np.power(a, 2)

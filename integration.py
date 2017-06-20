@@ -1,5 +1,25 @@
 import numpy as np
-import ipdb
+#import ipdb
+
+def fidelite(x):
+    J = []
+    taille = 10
+    for i in range(taille):
+        J.append(calcul_rms(x[i*100:i*100+100]))
+    Vmin = np.min(J)
+    Vmax = np.max(J)
+
+    return Vmax-Vmin
+
+def variance_rms(x):
+    J = []
+    taille = 10
+    for i in range(taille):
+        J.append(calcul_rms(x[i*100:i*100+100]))
+    return np.sqrt(np.var(J))
+
+def calcul_rms(x, axis=None):
+        return np.sqrt(np.mean(x**2, axis=axis))
 
 def calcul_offset(vect_x, vect_y, vect_z, taille_cal_offset):
     taille_tab = len(vect_x)
@@ -95,7 +115,7 @@ def trouve_ind_divergence(vect, val_divergence):
 
 def trouve_dis_div_temps(vect, temps, freq_ech):
     taille_vect = len(vect)
-    nb_ech_stop = temps / (1./freq_ech)
+    nb_ech_stop = temps / (1/freq_ech)
     return vect[nb_ech_stop]
 
 
