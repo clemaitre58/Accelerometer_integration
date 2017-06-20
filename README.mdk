@@ -1,0 +1,8 @@
+# About the python function in this repo
+
+You could find here some numerical integration function.
+You will find classique square method algorithm and simpson's method. For both, it's possible you wiff find 1st and 2nd derivative.
+
+You also find some methods to evaluate the drift for stationnary position.
+
+
