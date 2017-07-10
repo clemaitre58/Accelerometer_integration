@@ -12,23 +12,32 @@ import numpy as np
 
 from convertCSV import *
 from integration import *
-freq_ech = 20
+from utils import *
+freq_ech = 100
 
 #str_path_data = "/home/cedric/Documents/Riganami/Data/TestMagneto/11_6_11.CSV"
-str_path_data = "/home/cedric/Documents/Conseil/Drumistic/Documents/DocProtoExplo/D_Drummer_Proto_Explo/TestDrift/Data/data_lin_accelero.csv"
+#str_path_data = "/home/cedric/Documents/Conseil/Drumistic/Documents/DocProtoExplo/D_Drummer_Proto_Explo/TestDrift/Data/data_lin_accelero.csv"
 #str_path_data = "/home/cedric/Documents/Riganami/Data/Mesures_Terrain/11_22_50.CSV"
-
+str_path_data = "/home/cedric/Documents/Conseil/Drumistic/TestMpu9250/test_comp_MPU92502s_mod.csv"
 #str_path_data = "/home/cedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
 df = pd.read_csv(str_path_data)
 
 #print type(df)
 
 
-[Ax,Ay,Az] = CropData(df, 2000, 8532)
+[Ax, Ay, Az, q0, q1, q2, q3, timestamp] = CropData(df, 1300, 2500)
+delta_t = calc_deltat(timestamp)
+[Axi, Ayi, Azi] = rep_boitier_inertiel(Ax, Ay, Az, q0, q1, q2, q3)
+
 
 #ValidationData(df)
 
-[Axc,Ayc,Azc] = ConvertData(Ax,Ay,Az,)
+#[Axc,Ayc,Azc] = ConvertData(Ax,Ay,Az)
+# convertion en g
+
+print(type(Axi))
+
+[Axc, Ayc, Azc] = [Axi/1000, Ayi/1000, Azi/1000]
 
 print ("Ax -> Valeur maxi : " + str(max(Axc)) + " Valeur mini : " + str(min(Axc)) + " Valeur moyenne : " + str(sum(Axc)/len(Axc)) + " Ecart type : " + str(np.std(Axc)))
 print ("Ay -> Valeur maxi : " + str(max(Ayc)) + " Valeur mini : " + str(min(Ayc)) + " Valeur moyenne : " + str(sum(Ayc)/len(Ayc)) + " Ecart type : " + str(np.std(Ayc)))
@@ -175,7 +184,7 @@ print("Offset A : " + str(Compute_offset(sum(Axc)/len(Axc), sum(Ayc)/len(Ayc), s
 #
 #plt.show()
 #
-val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
+#val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
 velocity_init = []
 velocity_init.extend([0, 0, 0])
 position_init = []
@@ -184,7 +193,7 @@ position_init.extend([0, 0, 0])
 Axc = Conv_g2ms2(Axc)
 Ayc = Conv_g2ms2(Ayc)
 Azc = Conv_g2ms2(Azc)
-velocity, position = double_integration(Axc, Ayc, Azc, val_calibrtion_zero, velocity_init, position_init, freq_ech)
+#velocity, position = double_integration(Axc, Ayc, Azc, val_calibrtion_zero, velocity_init, position_init, freq_ech)
 
 velocity_simpson, position_simpson = double_integration_simpson(
     Axc,
@@ -193,37 +202,37 @@ velocity_simpson, position_simpson = double_integration_simpson(
     val_calibrtion_zero,
     velocity_init,
     position_init,
-    freq_ech,
+    delta_t,
     20)
 
-print (np.shape(position))
-print (np.shape(Axc))
-var_distance_plan_xy = position_dist_origine_planxy(position[0, :], position[1, :])
-var_distance_plan_xy_simpson = position_dist_origine_planxy(
-    position_simpson[0, :],
-    position_simpson[1, :])
-
-val_maxi_div = 0.2
-
-print(var_distance_plan_xy)
-
-ind_div_max = trouve_ind_divergence(var_distance_plan_xy, val_maxi_div)
-
-print(ind_div_max)
-
-
-temps_div_dist = trouve_dis_div_temps(var_distance_plan_xy, 60, freq_ech)
-temps_div_dist_1 = trouve_dis_div_temps(var_distance_plan_xy, 1, freq_ech)
-print("temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec")
-print("Distance de diverge apres 1min : " + str(temps_div_dist) + "m")
-#fig = plt.figure()
-ind_div_max_simpson = trouve_ind_divergence(var_distance_plan_xy_simpson, val_maxi_div)
-
-temps_div_dist_simpson = trouve_dis_div_temps(var_distance_plan_xy_simpson, 60, freq_ech)
-
-print ("Methode de Simpson -> temps pour diverger de " + str(val_maxi_div)  + "m : " + str(ind_div_max_simpson* 1./freq_ech) + "sec")
-print ("Methode de Simpson -> Distance de diverge apres 1min : " + str(temps_div_dist_simpson) + "m")
-print ("Methode de Simpson -> Distance de diverge apres 1sec : " + str(temps_div_dist_1) + "m")
+#print (np.shape(position))
+#print (np.shape(Axc))
+#var_distance_plan_xy = position_dist_origine_planxy(position[0, :], position[1, :])
+#var_distance_plan_xy_simpson = position_dist_origine_planxy(
+#    position_simpson[0, :],
+#    position_simpson[1, :])
+#
+#val_maxi_div = 0.2
+#
+#print(var_distance_plan_xy)
+#
+#ind_div_max = trouve_ind_divergence(var_distance_plan_xy, val_maxi_div)
+#
+#print(ind_div_max)
+#
+#
+##temps_div_dist = trouve_dis_div_temps(var_distance_plan_xy, 60, freq_ech)
+#temps_div_dist_1 = trouve_dis_div_temps(var_distance_plan_xy, 1, freq_ech)
+#print("temps pour diverger de " + str(val_maxi_div)  + "mm : " + str(ind_div_max * 1./freq_ech) + "sec")
+##print("Distance de diverge apres 1min : " + str(temps_div_dist) + "m")
+##fig = plt.figure()
+#ind_div_max_simpson = trouve_ind_divergence(var_distance_plan_xy_simpson, val_maxi_div)
+#
+##temps_div_dist_simpson = trouve_dis_div_temps(var_distance_plan_xy_simpson, 60, freq_ech)
+#
+#print ("Methode de Simpson -> temps pour diverger de " + str(val_maxi_div)  + "m : " + str(ind_div_max_simpson* 1./freq_ech) + "sec")
+##print ("Methode de Simpson -> Distance de diverge apres 1min : " + str(temps_div_dist_simpson) + "m")
+#print ("Methode de Simpson -> Distance de diverge apres 1sec : " + str(temps_div_dist_1) + "m")
 #ipdb.set_trace()
 #delta_pos = np.abs(
 #    (

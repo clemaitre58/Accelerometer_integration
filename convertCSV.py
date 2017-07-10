@@ -45,57 +45,76 @@ def  ConvertData(Ax,Ay,Az) :
 
 def CropData(Data, Debut,Fin):
 
-	# Accelerometre
-	Ax = Data['Ax'].values
-	Ay = Data['Ay'].values
-	Az = Data['Az'].values
+    Data = Data.astype(float)
 
-	## goniometre
-	#Gx = Data['Gx'].values
-	#Gy = Data['Gy'].values
-	#Gz = Data['Gz'].values
-
-	##magnetometre
-	#Mx = Data['Mx'].values
-	#My = Data['My'].values
-	#Mz = Data['Mz'].values
-
-	##capteur de temperature
-	#ATemp = Data['ATemp'].values
-
-	##sonar
-	#Sonar = Data['SONAR'].values
-
-	##gps
-	#GPSL = Data['GPSL'].values
-	#GPSl = Data['GPSl'].values
-
-	## conversion des donees
-
-	Axc = Ax[Debut:Fin]
-	Ayc = Ay[Debut:Fin]
-	Azc = Az[Debut:Fin]
-
-
-	#Gxc = Gx[Debut:Fin]
-	#Gyc = Gy[Debut:Fin]
-	#Gzc = Gz[Debut:Fin]
-
-	#Mxc = Mx[Debut:Fin]
-	#Myc = My[Debut:Fin]
-	#Mzc = Mz[Debut:Fin]
-
-	#ATempc = ATemp[Debut:Fin]
-
-	#Sonarc = Sonar[Debut:Fin]
-
-
-	#GPSLc = GPSL[Debut:Fin]
-
-	#GPSlc = GPSl[Debut:Fin]
-
-
-	return(Axc,Ayc,Azc)
+    # Accelerometre
+    Ax = Data['Ax'].values
+    Ay = Data['Ay'].values
+    Az = Data['Az'].values
+    
+    # Quaternion
+    q0 = Data['q0'].values
+    q1 = Data['q1'].values
+    q2 = Data['q2'].values
+    q3 = Data['q3'].values
+    
+    # Timestamp
+    timestamp = Data['timestamp'].values
+    
+    ## goniometre
+    #Gx = Data['Gx'].values
+    #Gy = Data['Gy'].values
+    #Gz = Data['Gz'].values
+    
+    ##magnetometre
+    #Mx = Data['Mx'].values
+    #My = Data['My'].values
+    #Mz = Data['Mz'].values
+    
+    ##capteur de temperature
+    #ATemp = Data['ATemp'].values
+    
+    ##sonar
+    #Sonar = Data['SONAR'].values
+    
+    ##gps
+    #GPSL = Data['GPSL'].values
+    #GPSl = Data['GPSl'].values
+    
+    ## conversion des donees
+    
+    Axc = Ax[Debut:Fin]
+    Ayc = Ay[Debut:Fin]
+    Azc = Az[Debut:Fin]
+    
+    # Quaternion
+    q0c = q0[Debut:Fin]
+    q1c = q1[Debut:Fin]
+    q2c = q2[Debut:Fin]
+    q3c = q3[Debut:Fin]
+    
+    # Timestamp
+    timestampc = timestamp[Debut:Fin]
+    
+    #Gxc = Gx[Debut:Fin]
+    #Gyc = Gy[Debut:Fin]
+    #Gzc = Gz[Debut:Fin]
+    
+    #Mxc = Mx[Debut:Fin]
+    #Myc = My[Debut:Fin]
+    #Mzc = Mz[Debut:Fin]
+    
+    #ATempc = ATemp[Debut:Fin]
+    
+    #Sonarc = Sonar[Debut:Fin]
+    
+    
+    #GPSLc = GPSL[Debut:Fin]
+    
+    #GPSlc = GPSl[Debut:Fin]
+    
+    
+    return(Axc, Ayc, Azc, q0c, q1c, q2c, q3c, timestamp)
 
 def Compute_offset(a, b, c):
     a_2 = np.power(a, 2)

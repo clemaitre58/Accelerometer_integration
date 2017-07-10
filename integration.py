@@ -35,8 +35,7 @@ def calcul_offset(vect_x, vect_y, vect_z, taille_cal_offset):
     offset = np.vstack((offset_x, offset_y, offset_z))
     return offset
 
-def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, freq_ech):
-    delta_t = 1./freq_ech
+def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, delta_t):
     taille_vect = len(vect_x)
     velocity_x = []
     velocity_y = []
@@ -46,9 +45,9 @@ def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, posit
     position_y = []
     position_z = []
     for i in range(taille_vect):
-        if (i == 0):
+        if (i == 1):
             #Attention a le faire plus proprement pour initialisation different de
-            # A(0, 0,0) V(0, 0, 0)
+            # X(0, 0,0) V(0, 0, 0)
             velocity_x.append(velocity_init[0])
             velocity_y.append(velocity_init[1])
             velocity_z.append(velocity_init[2])
@@ -56,23 +55,23 @@ def double_integration(vect_x, vect_y, vect_z, calibration, velocity_init, posit
             position_x.append(position_init[0])
             position_y.append(position_init[1])
             position_z.append(position_init[2])
-        if (i == 1):
-            velocity_x.append(velocity_init[0]+integration_trapeze_init(velocity_init[0], i, vect_x, delta_t))
-            velocity_y.append(velocity_init[1]+integration_trapeze_init(velocity_init[1], i, vect_y, delta_t))
-            velocity_z.append(velocity_init[2]+integration_trapeze_init(velocity_init[2], i, vect_z, delta_t))
+        if (i == 2):
+            velocity_x.append(velocity_init[0]+integration_trapeze_init(velocity_init[0], i, vect_x, delta_t[i]))
+            velocity_y.append(velocity_init[1]+integration_trapeze_init(velocity_init[1], i, vect_y, delta_t[i]))
+            velocity_z.append(velocity_init[2]+integration_trapeze_init(velocity_init[2], i, vect_z, delta_t[i]))
 
-            position_x.append(position_init[0]+integration_trapeze_init(position_init[0], i, velocity_x, delta_t))
-            position_y.append(position_init[1]+integration_trapeze_init(position_init[1], i, velocity_y, delta_t))
-            position_z.append(position_init[2]+integration_trapeze_init(position_init[2], i, velocity_z, delta_t))
-        if (i > 1):
+            position_x.append(position_init[0]+integration_trapeze_init(position_init[0], i, velocity_x, delta_t[i]))
+            position_y.append(position_init[1]+integration_trapeze_init(position_init[1], i, velocity_y, delta_t[i]))
+            position_z.append(position_init[2]+integration_trapeze_init(position_init[2], i, velocity_z, delta_t[i]))
+        if (i > 2):
             #ipdb.set_trace()
-            velocity_x.append(velocity_x[i-1]+integration_trapeze(i-1, i, vect_x, delta_t))
-            velocity_y.append(velocity_y[i-1]+integration_trapeze(i-1, i, vect_y, delta_t))
-            velocity_z.append(velocity_z[i-1]+integration_trapeze(i-1, i, vect_z, delta_t))
+            velocity_x.append(velocity_x[i-1]+integration_trapeze(i-1, i, vect_x, delta_t[i]))
+            velocity_y.append(velocity_y[i-1]+integration_trapeze(i-1, i, vect_y, delta_t[i]))
+            velocity_z.append(velocity_z[i-1]+integration_trapeze(i-1, i, vect_z, delta_t[i]))
 
-            position_x.append(position_x[i-1]+integration_trapeze(i-1, i, velocity_x, delta_t))
-            position_y.append(position_y[i-1]+integration_trapeze(i-1, i, velocity_y, delta_t))
-            position_z.append(position_z[i-1]+integration_trapeze(i-1, i, velocity_z, delta_t))
+            position_x.append(position_x[i-1]+integration_trapeze(i-1, i, velocity_x, delta_t[i]))
+            position_y.append(position_y[i-1]+integration_trapeze(i-1, i, velocity_y, delta_t[i]))
+            position_z.append(position_z[i-1]+integration_trapeze(i-1, i, velocity_z, delta_t[i]))
     #ipdb.set_trace()
     #    print np.shape(position_x)
     #    print np.shape(position_y)
@@ -115,13 +114,15 @@ def trouve_ind_divergence(vect, val_divergence):
 
 def trouve_dis_div_temps(vect, temps, freq_ech):
     taille_vect = len(vect)
+    print("taille vecteur : " +  str(taille_vect))
+    print("temps : " + str(temps))
+
     nb_ech_stop = temps / (1/freq_ech)
     
     return vect[int(nb_ech_stop)]
 
 
-def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, freq_ech, nb_ech):
-    delta_t = 1./freq_ech
+def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_init, position_init, delta_t, nb_ech):
     taille_vect = len(vect_x)
     velocity_x = []
     velocity_y = []
@@ -131,7 +132,7 @@ def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_ini
     position_y = []
     position_z = []
     for i in range(taille_vect-nb_ech):
-        if (i == 0):
+        if (i == 1):
             velocity_x.append(velocity_init[0])
             velocity_y.append(velocity_init[1])
             velocity_z.append(velocity_init[2])
@@ -139,23 +140,23 @@ def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_ini
             position_x.append(position_init[0])
             position_y.append(position_init[1])
             position_z.append(position_init[2])
-        if (i == 1):
-            velocity_x.append(velocity_init[0]+integration_simpson_init(velocity_init[0], i, vect_x, delta_t, nb_ech))
-            velocity_y.append(velocity_init[1]+integration_simpson_init(velocity_init[1], i, vect_y, delta_t, nb_ech))
-            velocity_z.append(velocity_init[2]+integration_simpson_init(velocity_init[2], i, vect_z, delta_t, nb_ech))
+        if (i == 2):
+            velocity_x.append(velocity_init[0]+integration_simpson_init(velocity_init[0], i, vect_x, delta_t[i-1], nb_ech))
+            velocity_y.append(velocity_init[1]+integration_simpson_init(velocity_init[1], i, vect_y, delta_t[i-1], nb_ech))
+            velocity_z.append(velocity_init[2]+integration_simpson_init(velocity_init[2], i, vect_z, delta_t[i-1], nb_ech))
 
-            position_x.append(position_init[0]+integration_simpson_init(position_init[0], i, velocity_x, delta_t, nb_ech))
-            position_y.append(position_init[1]+integration_simpson_init(position_init[1], i, velocity_y, delta_t, nb_ech))
-            position_z.append(position_init[2]+integration_simpson_init(position_init[2], i, velocity_z, delta_t, nb_ech))
-        if (i > 1):
+            position_x.append(position_init[0]+integration_simpson_init(position_init[0], i, velocity_x, delta_t[i-1], nb_ech))
+            position_y.append(position_init[1]+integration_simpson_init(position_init[1], i, velocity_y, delta_t[i-1], nb_ech))
+            position_z.append(position_init[2]+integration_simpson_init(position_init[2], i, velocity_z, delta_t[i-1], nb_ech))
+        if (i > 2):
             #ipdb.set_trace()
-            velocity_x.append(velocity_x[i-1]+integration_simpson(i-1, i, vect_x, delta_t, nb_ech))
-            velocity_y.append(velocity_y[i-1]+integration_simpson(i-1, i, vect_y, delta_t, nb_ech))
-            velocity_z.append(velocity_z[i-1]+integration_simpson(i-1, i, vect_z, delta_t, nb_ech))
+            velocity_x.append(velocity_x[i-1]+integration_simpson(i-1, i, vect_x, delta_t[i-1], nb_ech))
+            velocity_y.append(velocity_y[i-1]+integration_simpson(i-1, i, vect_y, delta_t[i-1], nb_ech))
+            velocity_z.append(velocity_z[i-1]+integration_simpson(i-1, i, vect_z, delta_t[i-1], nb_ech))
 
-            position_x.append(position_x[i-1]+integration_simpson(i-1, i, velocity_x, delta_t, nb_ech))
-            position_y.append(position_y[i-1]+integration_simpson(i-1, i, velocity_y, delta_t, nb_ech))
-            position_z.append(position_z[i-1]+integration_simpson(i-1, i, velocity_z, delta_t, nb_ech))
+            position_x.append(position_x[i-1]+integration_simpson(i-1, i, velocity_x, delta_t[i-1], nb_ech))
+            position_y.append(position_y[i-1]+integration_simpson(i-1, i, velocity_y, delta_t[i-1], nb_ech))
+            position_z.append(position_z[i-1]+integration_simpson(i-1, i, velocity_z, delta_t[i-1], nb_ech))
     #ipdb.set_trace()
     #    print np.shape(position_x)
     #    print np.shape(position_y)
@@ -177,7 +178,7 @@ def integration_simpson(a, b, f, delta_t, nb_ech):
     return val_int
 
 def integration_simpson_init(val_init, b, f, delta_t, nb_ech):
-    a = 0
+    a = 0 # attention dans un cas réel
     f_a = val_init
     h = (b-a)/np.double(nb_ech)
     z = np.double(f_a+f[b])/6.
