@@ -7,8 +7,6 @@ def quat2matrot(q):
     :returns: TODO
 
     """
-
-    print(type(q[0]))
     r = q[0]
     i = q[1]
     j = q[2]
@@ -59,6 +57,7 @@ def calc_deltat(timestamp):
 
     """
     tab_delta =  np.diff(timestamp)
+    tab_delta = tab_delta / 1000000
 
     
     return tab_delta
@@ -79,22 +78,17 @@ def rep_boitier_inertiel(Ax, Ay, Az, q0, q1, q2, q3):
     Axi = []
     Ayi = []
     Azi = []
-
     A= []
 
 
     m_r = process_all_q2mr(q0, q1, q2, q3)
-    np.array(Axi)
-    np.array(Ayi)
-    np.array(Azi)
+
     for i in range(len(Ax)):
         A = np.array([Ax[i], Ay[i], Az[i]])
-        Ares = np.dot(m_r[i], A.T)
+        Ares = np.dot(m_r[i].T, A.T)
         Axi.append(Ares[0])
         Ayi.append(Ares[1])
         Azi.append(Ares[2])
 
-    np.array(Axi)
-    print(type(Axi))
 
-    return Axi, Ayi, Azi
+    return np.array(Axi), np.array(Ayi), np.array(Azi)

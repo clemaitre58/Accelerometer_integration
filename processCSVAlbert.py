@@ -13,19 +13,19 @@ import numpy as np
 from convertCSV import *
 from integration import *
 from utils import *
+from plot_utils import *
 freq_ech = 100
 
 #str_path_data = "/home/cedric/Documents/Riganami/Data/TestMagneto/11_6_11.CSV"
 #str_path_data = "/home/cedric/Documents/Conseil/Drumistic/Documents/DocProtoExplo/D_Drummer_Proto_Explo/TestDrift/Data/data_lin_accelero.csv"
 #str_path_data = "/home/cedric/Documents/Riganami/Data/Mesures_Terrain/11_22_50.CSV"
-str_path_data = "/home/cedric/Documents/Conseil/Drumistic/TestMpu9250/test_comp_MPU92502s_mod.csv"
+str_path_data = "/home/cedric/Documents/Conseil/Drumistic/TestMpu9250/data_cyrille7_mod.csv"
 #str_path_data = "/home/cedric/Documents/Riganami/Data/Bruit_Stationnaire/15_12_17/13_28_15.CSV"
 df = pd.read_csv(str_path_data)
 
-#print type(df)
 
 
-[Ax, Ay, Az, q0, q1, q2, q3, timestamp] = CropData(df, 1300, 2500)
+[Ax, Ay, Az, q0, q1, q2, q3, timestamp] = CropData(df, 440,30000)
 delta_t = calc_deltat(timestamp)
 [Axi, Ayi, Azi] = rep_boitier_inertiel(Ax, Ay, Az, q0, q1, q2, q3)
 
@@ -35,7 +35,6 @@ delta_t = calc_deltat(timestamp)
 #[Axc,Ayc,Azc] = ConvertData(Ax,Ay,Az)
 # convertion en g
 
-print(type(Axi))
 
 [Axc, Ayc, Azc] = [Axi/1000, Ayi/1000, Azi/1000]
 
@@ -184,7 +183,7 @@ print("Offset A : " + str(Compute_offset(sum(Axc)/len(Axc), sum(Ayc)/len(Ayc), s
 #
 #plt.show()
 #
-#val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
+val_calibrtion_zero = calcul_offset(Axc, Ayc, Azc, len(Axc))
 velocity_init = []
 velocity_init.extend([0, 0, 0])
 position_init = []
@@ -195,15 +194,29 @@ Ayc = Conv_g2ms2(Ayc)
 Azc = Conv_g2ms2(Azc)
 #velocity, position = double_integration(Axc, Ayc, Azc, val_calibrtion_zero, velocity_init, position_init, freq_ech)
 
-velocity_simpson, position_simpson = double_integration_simpson(
-    Axc,
-    Ayc,
-    Azc,
-    val_calibrtion_zero,
-    velocity_init,
-    position_init,
-    delta_t,
-    20)
+position_x, velocity_x = double_int_class(Axc, delta_t, 0, 0)
+position_y, velocity_y = double_int_class(Ayc, delta_t, 0, 0)
+position_z, velocity_z = double_int_class(Azc, delta_t, 0, 0)
+
+position = []
+velocity = []
+
+position = np.array([position_x, position_y, position_z])
+velocity = np.array([velocity_x, velocity_y, velocity_z])
+
+#velocity_simpson, position_simpson = double_integration_simpson(
+#    Axc,
+#    Ayc,
+#    Azc,
+#    [0, 0, 0],
+#    velocity_init,
+#    position_init,
+#    delta_t,
+#    20)
+
+plot_3d_dist(position[0, :],  position[1, :], position[2, :])
+plot_3d_dist(velocity[0, :],  velocity[1, :], velocity[2, :])
+
 
 #print (np.shape(position))
 #print (np.shape(Axc))

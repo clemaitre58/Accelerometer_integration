@@ -145,18 +145,22 @@ def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_ini
             velocity_y.append(velocity_init[1]+integration_simpson_init(velocity_init[1], i, vect_y, delta_t[i-1], nb_ech))
             velocity_z.append(velocity_init[2]+integration_simpson_init(velocity_init[2], i, vect_z, delta_t[i-1], nb_ech))
 
-            position_x.append(position_init[0]+integration_simpson_init(position_init[0], i, velocity_x, delta_t[i-1], nb_ech))
-            position_y.append(position_init[1]+integration_simpson_init(position_init[1], i, velocity_y, delta_t[i-1], nb_ech))
-            position_z.append(position_init[2]+integration_simpson_init(position_init[2], i, velocity_z, delta_t[i-1], nb_ech))
+            position_x.append(position_init[0]+integration_simpson_init(position_init[0], i-1, velocity_x, delta_t[i-1], nb_ech))
+            position_y.append(position_init[1]+integration_simpson_init(position_init[1], i-1, velocity_y, delta_t[i-1], nb_ech))
+            position_z.append(position_init[2]+integration_simpson_init(position_init[2], i-1, velocity_z, delta_t[i-1], nb_ech))
         if (i > 2):
             #ipdb.set_trace()
-            velocity_x.append(velocity_x[i-1]+integration_simpson(i-1, i, vect_x, delta_t[i-1], nb_ech))
-            velocity_y.append(velocity_y[i-1]+integration_simpson(i-1, i, vect_y, delta_t[i-1], nb_ech))
-            velocity_z.append(velocity_z[i-1]+integration_simpson(i-1, i, vect_z, delta_t[i-1], nb_ech))
-
-            position_x.append(position_x[i-1]+integration_simpson(i-1, i, velocity_x, delta_t[i-1], nb_ech))
-            position_y.append(position_y[i-1]+integration_simpson(i-1, i, velocity_y, delta_t[i-1], nb_ech))
-            position_z.append(position_z[i-1]+integration_simpson(i-1, i, velocity_z, delta_t[i-1], nb_ech))
+            #print(i)
+            #print("velocity : " + str(len(velocity_x)))
+            velocity_x.append(velocity_x[i-2]+integration_simpson(i-1, i, vect_x, delta_t[i-1], nb_ech))
+            velocity_y.append(velocity_y[i-2]+integration_simpson(i-1, i, vect_y, delta_t[i-1], nb_ech))
+            velocity_z.append(velocity_z[i-2]+integration_simpson(i-1, i, vect_z, delta_t[i-1], nb_ech))
+            #print(position_x[i-2])
+            #print(velocity_x[i-1])
+            #print(velocity_x[i-2])
+            position_x.append(position_x[i-2]+integration_simpson(i-2, i-1, velocity_x, delta_t[i-1], nb_ech))
+            position_y.append(position_y[i-2]+integration_simpson(i-2, i-1, velocity_y, delta_t[i-1], nb_ech))
+            position_z.append(position_z[i-2]+integration_simpson(i-2, i-1, velocity_z, delta_t[i-1], nb_ech))
     #ipdb.set_trace()
     #    print np.shape(position_x)
     #    print np.shape(position_y)
@@ -166,13 +170,14 @@ def double_integration_simpson(vect_x, vect_y, vect_z, calibration, velocity_ini
 
 def integration_simpson(a, b, f, delta_t, nb_ech):
     h = (b-a)/np.double(nb_ech)
-    z = np.double(f[a]+f[b])/6.
-    for i in range(1,nb_ech) :
-        z = z+f[np.int(a+i*h)]/3.
-    for i in range(nb_ech) :
-        z=z+f[np.int(a+(2.*i+1)*h/2.)]*2./3.
+    z = np.double(f[a]+f[b])
 
-    val_int =  z*h
+    for i in range(1,nb_ech,2) :
+        z += 4 * f[np.int(a+i*h)]
+    for i in range(2, nb_ech-1, 2):
+        z += 4 * f[np.int(a+i*h)]
+
+    val_int =  z*h /3
     val_int *= delta_t
 
     return val_int
@@ -191,3 +196,29 @@ def integration_simpson_init(val_init, b, f, delta_t, nb_ech):
     val_int *= delta_t
 
     return val_int
+
+def double_int_class(vect, delta_t, x0, v0):
+    """calcul de la double integration à la bourrin
+
+    :vect: TODO
+    :delta_t: TODO
+    :x0: TODO
+    :y0: TODO
+    :returns: TODO
+
+    """
+    x = []
+    v = []
+
+    for i in range(len(vect) - 1):
+        if i==0 :
+            v.append(delta_t[i] * vect[i] + v0)
+        else:
+            v.append(delta_t[i] * vect[i] + v[i-1])
+    for i in range(len(vect) - 1):
+        if i==0:
+            x.append(delta_t[i] * v[i] + x0)
+        else:
+            x.append(delta_t[i] * v[i] + x[i-1])
+    
+    return np.array(x), np.array(v)
